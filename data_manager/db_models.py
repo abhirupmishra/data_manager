@@ -10,7 +10,7 @@ import pandas as pd
 
 HEADER_MESSAGE = '\n\"\"\"\n' \
                  'Database engine connections that the application ' \
-                 'would connect to.' \
+                 'would connect to. \n' \
                  'AUTO-GENERATED, please run: \n\n' \
                  'from data_manager import db_models \n ' \
                  'get_db_engines(<options>) \n' \
