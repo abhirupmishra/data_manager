@@ -135,23 +135,3 @@ def generate_db_details(db_model_items: List[DBModelItem], export_path: str,
             )
             __build_orm_models(db_model_item=db_model_item, output_path=orm_classes_path,
                                engine_string=engine_string)
-
-
-if __name__ == '__main__':
-    os.environ['quant_host'] = 'ls-806180ea5881545eb886a0f84ab6cb22e21b1322.crxkh4ybdjoe.us-east-1.rds.amazonaws.com'
-    os.environ['quant_user'] = 'quant'
-    os.environ['quant_password'] = 'RV%LR8krg_;*C,N0<_p-x1_l&=o,NR;%'
-    os.environ['quant_database'] = 'dbquant'
-    EXPORT_PATH = 'data_manager/examples/'
-    ORM_PATH = 'data_manager/examples/'
-
-    DB_MODEL_ITEMS = [DBModelItem(
-        db_host='quant_host', db_user='quant_user',
-        db_password='quant_password', db_database='quant_database',
-        db_schemas=['datafeeds', 'process', 'research']
-    )]
-
-    generate_db_details(
-        db_model_items=DB_MODEL_ITEMS, export_path=EXPORT_PATH,
-        orm_flag=True, orm_classes_path=ORM_PATH
-    )
