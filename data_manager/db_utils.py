@@ -1,11 +1,11 @@
 """
 Database utils
 """
-from sqlalchemy.engine.base import Engine
 import pandas as pd
+from sqlalchemy.engine.base import Engine
 
 
-def read_sql(sql_text: str, engine: Engine, chunksize: int = 100000,  **parameters):
+def read_sql(sql_text: str, engine: Engine, chunksize: int = 100000, **parameters):
     """
     read SQL query
     :param chunksize:

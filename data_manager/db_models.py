@@ -8,18 +8,19 @@ from dataclasses import dataclass
 from typing import Any, List
 
 
-HEADER_MESSAGE = '\n\"\"\"\n' \
+HEADER_MESSAGE = '\"\"\"\n' \
                  'Database engine connections that the application ' \
                  'would connect to. \n' \
                  'AUTO-GENERATED, please run: \n\n' \
                  'from data_manager import db_models \n ' \
                  'get_db_engines(<options>) \n' \
-                 'to generate connection strings and orm objects'
-PYLINT_MSG = '\n # pylint: skip-file \n'
-IMPORT_STRINGS = 'import os \n from sqlalchemy import create_engine'
+                 'to generate connection strings and orm objects ' \
+                 '\"\"\"'
+PYLINT_MESSAGE = '\n# pylint: skip-file \n\n'
+IMPORT_STRINGS = 'import os \nfrom sqlalchemy import create_engine \n\n'
 CONNECTION_STRING = 'postgres://{user}:{password}@{host}:5432/{database}'
-CONNECTION_STRING_VARS = "create_engine(postgres://' + os.environ['{user}'] + ':' +  os.environ['{password}'] + \
-                         '@' + os.environ['{host}'] + ' + :5432/' + os.environ['{database}'])"
+CONNECTION_STRING_VARS = "create_engine('postgres://' + os.environ['{user}'] + ':' + os.environ['{password}'] + " \
+                         "'@' + os.environ['{host}'] + ':5432/' + os.environ['{database}'])"
 ENGINE_STRING = '{engine_name} = {connection_string}\n\n'
 
 
@@ -43,22 +44,21 @@ def __build_orm_models(db_model_item: DBModelItem, output_path: str, engine_stri
     :param engine_string: sqlalchemy engine string
     :return:
     """
-    command = None
     if db_model_item.db_schemas is None:
         orm_name = db_model_item.db_database.lower() + '_models.py'
         orm_classes_path = output_path + orm_name
         command = 'sqlacodegen --outfile ' + orm_classes_path + \
-                  '--nojoined --noindexes --noviews --noconstraints ' \
-                  ' ' + engine_string
+                  ' --nojoined --noconstraints ' \
+                  ' "' + engine_string + '"'
+        os.system(command)
     else:
         for schema in db_model_item.db_schemas:
             orm_name = db_model_item.db_database.lower() + '_' + schema.lower() + '_models.py'
             orm_classes_path = output_path + orm_name
             command = 'sqlacodegen --outfile ' + orm_classes_path + \
-                      '--nojoined --noindexes --noviews --noconstraints ' \
-                      '--schema' + schema + ' ' + engine_string
-
-    os.system(command)
+                      ' --nojoined --noconstraints ' \
+                      ' --schema ' + schema + ' "' + engine_string + '"'
+            os.system(command)
 
 
 def __build_connection_string(host: str, user: str, password: str, database: str,
@@ -103,7 +103,7 @@ def __build_engine_file(output_path: str, db_model_items: List[DBModelItem]):
     # writing to __init__.py file
     with open(output_path + '__init__.py', 'w') as file_:
         file_.write(HEADER_MESSAGE)
-        file_.write(PYLINT_MSG)
+        file_.write(PYLINT_MESSAGE)
         file_.write(IMPORT_STRINGS)
 
         for eng_ in engine_strings:
@@ -135,3 +135,23 @@ def generate_db_details(db_model_items: List[DBModelItem], export_path: str,
             )
             __build_orm_models(db_model_item=db_model_item, output_path=orm_classes_path,
                                engine_string=engine_string)
+
+
+if __name__ == '__main__':
+    os.environ['quant_host'] = 'ls-806180ea5881545eb886a0f84ab6cb22e21b1322.crxkh4ybdjoe.us-east-1.rds.amazonaws.com'
+    os.environ['quant_user'] = 'quant'
+    os.environ['quant_password'] = 'RV%LR8krg_;*C,N0<_p-x1_l&=o,NR;%'
+    os.environ['quant_database'] = 'dbquant'
+    EXPORT_PATH = 'data_manager/examples/'
+    ORM_PATH = 'data_manager/examples/'
+
+    DB_MODEL_ITEMS = [DBModelItem(
+        db_host='quant_host', db_user='quant_user',
+        db_password='quant_password', db_database='quant_database',
+        db_schemas=['datafeeds', 'process', 'research']
+    )]
+
+    generate_db_details(
+        db_model_items=DB_MODEL_ITEMS, export_path=EXPORT_PATH,
+        orm_flag=True, orm_classes_path=ORM_PATH
+    )
