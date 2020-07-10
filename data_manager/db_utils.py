@@ -5,9 +5,10 @@ from sqlalchemy.engine.base import Engine
 import pandas as pd
 
 
-def read_sql(sql_text: str, engine: Engine, **parameters):
+def read_sql(sql_text: str, engine: Engine, chunksize: int = 100000,  **parameters):
     """
     read SQL query
+    :param chunksize:
     :param sql_text: sql text
     :param engine: sqlalchemy engine
     :param parameters:
