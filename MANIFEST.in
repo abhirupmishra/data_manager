@@ -1,1 +1,8 @@
 include requirements.txt
+include versioneer.py
+include data_manager/_version.py
+include README.md
+include LICENSE
+graft data_manager
+recursive-exclude * *.py[co]
+include versioneer.py
