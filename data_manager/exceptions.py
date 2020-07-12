@@ -14,5 +14,5 @@ class DatabaseError(psycopg2.DatabaseError):
         """
         constructor for the class
         """
-        message = 'database error'
+        message = 'database error - check again'
         super(DatabaseError, self).__init__(message)
