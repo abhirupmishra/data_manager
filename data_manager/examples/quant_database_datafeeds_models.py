@@ -1,8 +1,9 @@
 # coding: utf-8
+# pylint: skip-file
+
 from sqlalchemy import BigInteger, CHAR, Column, DateTime, Index, Integer, Numeric, SmallInteger, String, Text, text
 from sqlalchemy.ext.declarative import declarative_base
 
-# pylint: skip-file
 Base = declarative_base()
 metadata = Base.metadata
 
