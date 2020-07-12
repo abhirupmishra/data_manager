@@ -69,7 +69,7 @@ def to_sql(data: pd.DataFrame, engine: Engine, table_name: str,
         cursor_ = conn_.cursor()
 
         write_statement = INSERT_STATEMENT.format(
-            schema_table = table_,
+            schema_table=table_,
             columns=', '.join(data.columns.tolist()),
             table_values=', '.join([':' + s for s in data.columns.tolist()])
         )
@@ -109,7 +109,8 @@ def run_sql(sql_text: str, engine: Engine, **parameters) -> bool:
     return flag
 
 
-def __get_db_object(object_name: str, engine: Engine, schema_name:str = None, is_table: bool = False):
+def __get_db_object(object_name: str, engine: Engine, schema_name: str = None,
+                    is_table: bool = False):
     """
     postgres queries to check for schema name or table name
     :param object_name: objectname (stored procedure, table)
@@ -123,7 +124,8 @@ def __get_db_object(object_name: str, engine: Engine, schema_name:str = None, is
 
     # check if schema is valid
     if schema_name is not None:
-        query = "SELECT schema_name FROM information_schema.schemata where schema_name= :schema_name"
+        query = "SELECT schema_name FROM information_schema.schemata " \
+                "where schema_name= :schema_name"
         db_schema = read_sql(sql_text=query, engine=engine, schema_name=schema_name.lower())
 
         if db_schema.shape[0] == 0:

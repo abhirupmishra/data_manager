@@ -3,10 +3,11 @@ Build sqlalchemy ORM models using sqlacodegen to a specified directory.
 Methods to create SQL Alchemy connection strings and build db models
 """
 # pylint: disable=too-many-locals, too-many-arguments
-import os
-from dataclasses import dataclass
-from typing import Any, List
+# pylint: disable=too-few-public-methods, import-error
 
+import os
+from typing import Any, List
+from dataclasses import dataclass
 
 HEADER_MESSAGE = '\"\"\"\n' \
                  'Database engine connections that the application ' \
@@ -19,7 +20,8 @@ HEADER_MESSAGE = '\"\"\"\n' \
 PYLINT_MESSAGE = '\n# pylint: skip-file \n\n'
 IMPORT_STRINGS = 'import os \nfrom sqlalchemy import create_engine \n\n'
 CONNECTION_STRING = 'postgres://{user}:{password}@{host}:5432/{database}'
-CONNECTION_STRING_VARS = "create_engine('postgres://' + os.environ['{user}'] + ':' + os.environ['{password}'] + " \
+CONNECTION_STRING_VARS = "create_engine('postgres://' + os.environ['{user}'] + ':' " \
+                         "+ os.environ['{password}'] + " \
                          "'@' + os.environ['{host}'] + ':5432/' + os.environ['{database}'])"
 ENGINE_STRING = '{engine_name} = {connection_string}\n\n'
 

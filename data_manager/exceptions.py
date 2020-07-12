@@ -1,6 +1,8 @@
 """
 common exceptions for the data manager
 """
+# pylint: skip-file
+
 import psycopg2
 
 
