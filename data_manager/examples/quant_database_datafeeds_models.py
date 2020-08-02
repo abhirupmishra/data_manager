@@ -1,11 +1,19 @@
 # coding: utf-8
 # pylint: skip-file
-
-from sqlalchemy import BigInteger, CHAR, Column, DateTime, Index, Integer, Numeric, SmallInteger, String, Text, text
+from sqlalchemy import BigInteger, CHAR, Column, DateTime, Index, Integer, Numeric, SmallInteger, String, Table, Text, text
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 metadata = Base.metadata
+
+
+t_cboe_tickers = Table(
+    'cboe_tickers', metadata,
+    Column('id', BigInteger, nullable=False, server_default=text("nextval('datafeeds.cboe_tickers_id_seq'::regclass)")),
+    Column('ticker', String(20), nullable=False, comment='name of the symbol'),
+    Column('volume', BigInteger),
+    schema='datafeeds'
+)
 
 
 class DataVendor(Base):
@@ -19,6 +27,17 @@ class DataVendor(Base):
     data_source = Column(Text)
     created_date = Column(DateTime(True), server_default=text("CURRENT_TIMESTAMP"))
     last_updated = Column(DateTime(True), server_default=text("CURRENT_TIMESTAMP"))
+
+
+class EdgarCik(Base):
+    __tablename__ = 'edgar_cik'
+    __table_args__ = {'schema': 'datafeeds'}
+
+    id = Column(Integer, primary_key=True, server_default=text("nextval('datafeeds.edgar_cik_id_seq'::regclass)"))
+    ticker = Column(String(20), nullable=False)
+    cik = Column(String(10), nullable=False)
+    created_date = Column(DateTime(True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_date = Column(DateTime(True), server_default=text("CURRENT_TIMESTAMP"))
 
 
 class EquitySecurityIdentifier(Base):
@@ -42,6 +61,41 @@ class Exchange(Base):
     currency = Column(CHAR(3), nullable=False)
     created_date = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
     update_date = Column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+
+
+class NasdaqEquity(Base):
+    __tablename__ = 'nasdaq_equity'
+    __table_args__ = {'schema': 'datafeeds'}
+
+    id = Column(Integer, primary_key=True, server_default=text("nextval('datafeeds.nasdaq_equity_id_seq'::regclass)"))
+    ticker = Column(String(20), nullable=False)
+    name = Column(String(100), nullable=False)
+    ipo_year = Column(Integer)
+    sector = Column(String(100))
+    industry = Column(String(100))
+    exchange = Column(String(100))
+    created_date = Column(DateTime(True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_date = Column(DateTime(True), server_default=text("CURRENT_TIMESTAMP"))
+
+
+class SimfinSharePrice(Base):
+    __tablename__ = 'simfin_share_price'
+    __table_args__ = {'schema': 'datafeeds'}
+
+    id = Column(BigInteger, primary_key=True, server_default=text("nextval('datafeeds.simfin_share_price_id_seq'::regclass)"))
+    ticker = Column(String(20))
+    simfin_id = Column(Integer, nullable=False)
+    price_date = Column(DateTime(True), nullable=False)
+    created_date = Column(DateTime(True), nullable=False)
+    updated_date = Column(DateTime(True), nullable=False)
+    open_price = Column(Numeric(19, 4))
+    high_price = Column(Numeric(19, 4))
+    low_price = Column(Numeric(19, 4))
+    close_price = Column(Numeric(19, 4))
+    adj_close_price = Column(Numeric(19, 4))
+    dividend = Column(Numeric(19, 4))
+    volume = Column(BigInteger)
+    shares_outstanding = Column(Numeric(19, 4))
 
 
 class EquitySecurityExchangeMap(Base):

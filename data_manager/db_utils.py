@@ -1,13 +1,16 @@
 """
 Database utils
 """
+# pylint: disable=c-extension-no-member, unnecessary-comprehension
 from datetime import datetime
 from typing import List, Any
 
+import numpy as np
 import pandas as pd
 from sqlalchemy import text
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import Session
+from psycopg2.extensions import register_adapter, AsIs
 
 from .exceptions import DatabaseError
 
@@ -62,19 +65,20 @@ def to_sql(data: pd.DataFrame, engine: Engine, table_name: str,
     start = datetime.now()
     table_ = __get_db_object(
         object_name=table_name, schema_name=schema_name,
-        engine=engine
+        engine=engine, is_table=True
     )
     conn_ = engine.raw_connection()
     try:
         cursor_ = conn_.cursor()
-
         write_statement = INSERT_STATEMENT.format(
             schema_table=table_,
             columns=', '.join(data.columns.tolist()),
-            table_values=', '.join([':' + s for s in data.columns.tolist()])
+            table_values=', '.join(['%s' for _ in data.columns.tolist()])
         )
+        register_adapter(np.int64, AsIs)
         for _, rows_chunk in enumerate(_chunks(data, chunksize)):
-            cursor_.executemany(write_statement, rows_chunk.values.tolist())
+            chunks = rows_chunk.to_records(index=False)
+            cursor_.executemany(write_statement, chunks)
         conn_.commit()
     except DatabaseError:
         raise DatabaseError()
@@ -82,7 +86,7 @@ def to_sql(data: pd.DataFrame, engine: Engine, table_name: str,
         conn_.close()
 
     diff = datetime.now() - start
-    print('commited data in {time} hours'.format(time=str(diff)))
+    print('committed data in {time} hours'.format(time=str(diff)))
 
 
 def run_sql(sql_text: str, engine: Engine, **parameters) -> bool:
@@ -110,7 +114,7 @@ def run_sql(sql_text: str, engine: Engine, **parameters) -> bool:
 
 
 def __get_db_object(object_name: str, engine: Engine, schema_name: str = None,
-                    is_table: bool = False):
+                    is_table: bool = True):
     """
     postgres queries to check for schema name or table name
     :param object_name: objectname (stored procedure, table)
